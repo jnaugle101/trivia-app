@@ -103,11 +103,15 @@ else:
         st.markdown("### Review answers")
         st.write(f"✅ Correct: {right} ❌ Incorrect: {total - right}")
 
+        # Always show each question + user answer + correct answer (no expanders)
         for idx, h in enumerate(st.session_state.history, start=1):
-            with st.expander(f"Q{idx}: {'✅' if h['is_correct'] else '❌'}"):
-                st.write(h["q"])
-                st.write(f"**Your answer:** {h['user']}")
-                st.write(f"**Correct answer:** {h['correct']}")
+            icon = "✅" if h["is_correct"] else "❌"
+            st.markdown(
+                f"**Q{idx} {icon}**  \n"
+                f"{h['q']}  \n"
+                f"**Your answer:** {h['user']}  \n"
+                f"**Correct answer:** {h['correct']}"
+            )
 
         if st.button("Play again"):
             st.session_state.started = False
