@@ -2,60 +2,55 @@ import random
 import re
 import streamlit as st
 
-# ⬇️ import YOUR data (dict: question -> answer)
-from Trivia_Game import questions  # your original dict
+# ✅ Import YOUR question bank (a dict: question -> answer)
+from Trivia_Game import questions  # make sure Trivia_Game.py does NOT auto-run
 
+# ---- Page setup ----
 st.set_page_config(page_title="Trivia Game", page_icon="❓")
 st.title("❓ Trivia Game")
 
-# --- helpers ---
+# ---- Helpers ----
 def normalize(s: str) -> str:
-    # lower, strip spaces, collapse multiple spaces, remove basic punctuation
+    """Lowercase, trim, remove punctuation, collapse spaces."""
     s = s.lower().strip()
-    s = re.sub(r"[^\w\s]", "", s)     # remove punctuation
-    s = re.sub(r"\s+", " ", s)        # collapse spaces
+    s = re.sub(r"[^\w\s]", "", s)   # remove punctuation
+    s = re.sub(r"\s+", " ", s)     # collapse multiple spaces
     return s
 
-def is_correct(user, correct):
+def is_correct(user: str, correct: str) -> bool:
     """
-    Allows multiple valid variants like 'green or red', 'cancer, pisces, scorpio',
-    etc. Splits on common separators and checks each option.
+    Accepts minor variations. If the correct answer contains 'or' or commas,
+    match any of the parts (e.g., 'Green or red', 'Cancer, Pisces, Scorpio').
     """
     u = normalize(user)
     c = normalize(correct)
-
-    # split possible multiple answers
-    # treat "or" and commas as separators
     parts = re.split(r"\bor\b|,", c)
-    parts = [p.strip() for p in parts if p.strip()]
-    if not parts:
-        parts = [c]
-
-    # exact match against any acceptable variant
+    parts = [p.strip() for p in parts if p.strip()] or [c]
     return any(u == p for p in parts)
 
-# --- session state ---
+# ---- Session state ----
 if "started" not in st.session_state:
     st.session_state.started = False
-if "score" not in st.session_state:
-    st.session_state.score = 0
 if "index" not in st.session_state:
     st.session_state.index = 0
 if "order" not in st.session_state:
-    st.session_state.order = []
+    st.session_state.order = []     # list of questions in play-order
+if "history" not in st.session_state:
+    st.session_state.history = []   # list of dicts: {q, user, correct, is_correct}
 
-# --- start screen ---
+# ---- Start screen ----
 if not st.session_state.started:
     total_available = len(questions)
-    num_q = st.slider("How many questions?", 1, total_available, min(10, total_available))
+    num_default = min(10, total_available)
+    num_q = st.slider("How many questions?", 1, total_available, num_default)
     if st.button("Start"):
         st.session_state.order = random.sample(list(questions.keys()), k=num_q)
-        st.session_state.score = 0
+        st.session_state.history = []
         st.session_state.index = 0
         st.session_state.started = True
         st.rerun()
 
-# --- game flow ---
+# ---- Game flow ----
 else:
     i = st.session_state.index
     total = len(st.session_state.order)
@@ -64,22 +59,25 @@ else:
         q = st.session_state.order[i]
         correct = questions[q]
 
-        st.subheader(f"Question {i+1} of {total}")
+        st.subheader(f"Question {i + 1} of {total}")
         st.write(q)
 
         ans = st.text_input("Your answer:", key=f"ans_{i}")
 
-        col1, col2 = st.columns([1,1])
+        col1, col2 = st.columns(2)
         with col1:
             if st.button("Submit", key=f"submit_{i}"):
                 if not ans.strip():
                     st.warning("Please type an answer.")
                 else:
-                    if is_correct(ans, correct):
-                        st.success(f"✅ Correct!  ({correct})")
-                        st.session_state.score += 1
-                    else:
-                        st.error(f"❌ Incorrect. Correct answer: {correct}")
+                    ok = is_correct(ans, correct)
+                    # Record but DO NOT reveal correctness now (review at end)
+                    st.session_state.history.append({
+                        "q": q,
+                        "user": ans,
+                        "correct": correct,
+                        "is_correct": ok
+                    })
                     st.session_state.index += 1
                     st.rerun()
         with col2:
@@ -87,20 +85,33 @@ else:
                 st.session_state.started = False
                 st.rerun()
 
-        st.progress(i/total if total else 0)
+        st.progress(i / total if total else 0)
+
     else:
-        score = st.session_state.score
-        percentage = (score / total) * 100
+        # ---- End screen with score, percentage, and full review ----
+        right = sum(1 for h in st.session_state.history if h["is_correct"])
+        score = right
+        percentage = (score / total) * 100 if total else 0.0
 
         st.success(f"Game over! Your score: {score}/{total} ({percentage:.2f}%)")
 
-        # Feedback
         if percentage > 80:
             st.info("🌟 Excellent!")
         else:
-            st.warning("😬 Loser")  # keep your original wording here, or change it
+            st.warning("😬 Loser")
+
+        st.markdown("### Review answers")
+        st.write(f"✅ Correct: {right} ❌ Incorrect: {total - right}")
+
+        for idx, h in enumerate(st.session_state.history, start=1):
+            with st.expander(f"Q{idx}: {'✅' if h['is_correct'] else '❌'}"):
+                st.write(h["q"])
+                st.write(f"**Your answer:** {h['user']}")
+                st.write(f"**Correct answer:** {h['correct']}")
 
         if st.button("Play again"):
             st.session_state.started = False
+            st.session_state.index = 0
+            st.session_state.order = []
+            st.session_state.history = []
             st.rerun()
-
