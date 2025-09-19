@@ -89,7 +89,18 @@ else:
 
         st.progress(i/total if total else 0)
     else:
-        st.success(f"Game over! Your score: {st.session_state.score}/{total}")
+        score = st.session_state.score
+        percentage = (score / total) * 100
+
+        st.success(f"Game over! Your score: {score}/{total} ({percentage:.2f}%)")
+
+        # Feedback
+        if percentage > 80:
+            st.info("🌟 Excellent!")
+        else:
+            st.warning("😬 Loser")  # keep your original wording here, or change it
+
         if st.button("Play again"):
             st.session_state.started = False
             st.rerun()
+
