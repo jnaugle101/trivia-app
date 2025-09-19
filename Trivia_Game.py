@@ -114,4 +114,3 @@ def triva_game():
     else:
         print("Loser")
 
-triva_game()
