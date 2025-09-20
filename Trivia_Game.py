@@ -185,12 +185,6 @@ questions = {
 "Seven stars that form a large ladle or spoon-shaped pattern in the sky are known as what?":  "The Big Dipper",
 "What bear can only be found in only cold, Arctic regions of the world?":  "Polar bear",
 "How many inches are in a foot?":  "12"
-"Based on the popular children's book 'If You Give a Mouse a Cookie', what is he going to ask for?": "a glass of milk",
-"What are the four seasons of the year?": "Spring, summer, fall, winter",
-"What movie character says, 'To infinity ... and beyond!'": "Buzz Lightyear",
-"Siamese, Maine Coon, tabby, ragdoll, calico and shorthair are all types of what?": "Cats",
-"How many bases are there on a baseball field?": "4",
-"In 1776, the United States declared its independence from what country?": "Great Britain"
 }
 
 
