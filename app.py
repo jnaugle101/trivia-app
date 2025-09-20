@@ -2,6 +2,7 @@ import random
 import re
 import streamlit as st
 import difflib
+import math
 
 # ✅ Import YOUR question bank (a dict: question -> answer)
 from Trivia_Game import questions  # make sure Trivia_Game.py does NOT auto-run
@@ -58,6 +59,14 @@ def normalize(s: str) -> str:
 
     return s
 
+def alias_match(user_norm: str, correct_raw: str) -> bool:
+    c_norm = normalize(correct_raw)
+    for key, variants in ALIASES.items():
+        if normalize(key) == c_norm:
+            if any(user_norm == normalize(v) for v in variants):
+                return True
+    return False
+
 def is_correct(user: str, correct: str) -> bool:
     """
     Accepts minor variations. If the correct answer contains 'or' or commas,
@@ -65,6 +74,8 @@ def is_correct(user: str, correct: str) -> bool:
     """
     u = normalize(user)
     c = normalize(correct)
+    if alias_match(u, correct):
+        return True
     parts = re.split(r"\bor\b|,", c)
     parts = [p.strip() for p in parts if p.strip()] or [c]
 
@@ -89,7 +100,6 @@ if "order" not in st.session_state:
 if "history" not in st.session_state:
     st.session_state.history = []   # list of dicts: {q, user, correct, is_correct}
 
-# ---- Start screen ----
 # ---- Start screen ----
 if not st.session_state.started:
     # ✅ Rules visible when the app first opens
@@ -156,13 +166,14 @@ else:
 
         st.success(f"Game over! Your score: {score}/{total} ({percentage:.2f}%)")
 
-        if percentage > 80:
-            st.info("🌟 Excellent!")
+        needed = math.ceil(total * 0.70)  # 70% rule (your choice)
+        if percentage >= 70:
+            st.info("🌟 Excellent! You are Smarter than most!")
         else:
-            st.warning("😬 Loser")
+            st.warning(f"😬 Not quite Loser. You needed at least {needed}/{total} (70%).")
 
         st.markdown("### Review answers")
-        st.write(f"✅ Correct: {right} ❌ Incorrect: {total - right}")
+        st.write(f"✅ Correct: {right} ❌ Incorrect: {total - right}")
 
         # Always show each question + user answer + correct answer (no expanders)
         for idx, h in enumerate(st.session_state.history, start=1):
