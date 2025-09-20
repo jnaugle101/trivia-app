@@ -1,9 +1,17 @@
 import random
 import re
 import streamlit as st
+from rapidfuzz import fuzz
 
 # ✅ Import YOUR question bank (a dict: question -> answer)
 from Trivia_Game import questions  # make sure Trivia_Game.py does NOT auto-run
+
+ALIASES = {
+    "united states": {"usa", "u s a", "u.s.", "us", "u.s.a", "united states of america"},
+    "new york city": {"nyc", "new york", "ny"},
+    "007": {"james bond", "bond"},
+    "bible": {"the bible", "holy bible"},
+}
 
 # ---- Page setup ----
 st.set_page_config(page_title="Trivia Game", page_icon="❓")
@@ -29,10 +37,24 @@ with st.sidebar:
 
 # ---- Helpers ----
 def normalize(s: str) -> str:
-    """Lowercase, trim, remove punctuation, collapse spaces."""
+    """Lowercase, trim, replace common symbols, remove punctuation, collapse spaces."""
     s = s.lower().strip()
-    s = re.sub(r"[^\w\s]", "", s)   # remove punctuation
-    s = re.sub(r"\s+", " ", s)     # collapse multiple spaces
+
+    # Common replacements
+    s = s.replace("&", "and")          # treat "&" as "and"
+    s = s.replace("’", "'")            # smart apostrophe → normal
+    s = s.replace("´", "'")
+    s = s.replace("`", "'")
+
+    # Remove punctuation but keep letters/numbers/spaces
+    s = re.sub(r"[^\w\s]", " ", s)
+
+    # Collapse extra spaces
+    s = re.sub(r"\s+", " ", s)
+    # Strip leading "the "
+    if s.startswith("the "):
+        s = s[4:]
+
     return s
 
 def is_correct(user: str, correct: str) -> bool:
@@ -44,7 +66,18 @@ def is_correct(user: str, correct: str) -> bool:
     c = normalize(correct)
     parts = re.split(r"\bor\b|,", c)
     parts = [p.strip() for p in parts if p.strip()] or [c]
-    return any(u == p for p in parts)
+
+    for p in parts:
+        if u == p:
+            return True
+        if len(p) <= 3:  # super-short answers must match exactly
+            continue
+        ratio = difflib.SequenceMatcher(None, u, p).ratio()
+        thresh = 0.88 if len(p) <= 6 else 0.8
+        if ratio >= thresh:
+            return True
+
+    return False
 
 # ---- Session state ----
 if "started" not in st.session_state:
