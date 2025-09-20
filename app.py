@@ -2,6 +2,7 @@ import random
 import re
 import streamlit as st
 from rapidfuzz import fuzz
+import difflib
 
 # ✅ Import YOUR question bank (a dict: question -> answer)
 from Trivia_Game import questions  # make sure Trivia_Game.py does NOT auto-run

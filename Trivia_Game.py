@@ -1,7 +1,7 @@
 #list of questions
 #store the answers
 #randomly picked questions
-#askt he question
+#ask the question
 #check if correct answer
 #keep track of score
 #tell the user their score
