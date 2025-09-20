@@ -9,6 +9,7 @@ from Trivia_Game import questions  # make sure Trivia_Game.py does NOT auto-run
 ALIASES = {
     "united states": {"usa", "u s a", "u.s.", "us", "u.s.a", "united states of america"},
     "new york city": {"nyc", "new york", "ny"},
+    "washington, dc": {"DC", "Washington, DC", "Washington, D.C."},
     "007": {"james bond", "bond"},
     "bible": {"the bible", "holy bible"},
 }
