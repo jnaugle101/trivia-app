@@ -76,7 +76,7 @@ def is_correct(user: str, correct: str) -> bool:
     c = normalize(correct)
     if alias_match(u, correct):
         return True
-    parts = re.split(r"\bor\b|,", c)
+    parts = re.split(r"\bor\b|,|/|;", c)
     parts = [p.strip() for p in parts if p.strip()] or [c]
 
     for p in parts:
@@ -167,7 +167,7 @@ else:
         st.success(f"Game over! Your score: {score}/{total} ({percentage:.2f}%)")
 
         needed = math.ceil(total * 0.70)  # 70% rule (your choice)
-        if percentage >= 70:
+        if score >= needed:
             st.info("🌟 Excellent! You are Smarter than most!")
         else:
             st.warning(f"😬 Not quite Loser. You needed at least {needed}/{total} (70%).")
