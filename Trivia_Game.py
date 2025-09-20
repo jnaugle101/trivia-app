@@ -140,12 +140,6 @@ questions = {
 }
 
 def trivia_game():
-    print("🎮 Welcome to Trivia Game!\n")
-    print("📋 Rules & Tips:")
-    print("1. Answers with numbers must be digits (e.g., 1, 2, 1985).")
-    print("2. Spelling counts — check your answer before hitting Enter.")
-    print("3. No case sensitivity (answers aren’t affected by capitals).")
-    print("4. Each game has random questions.\n")
     questions_list = list(questions.keys())
     total_questions = 10
     score = 0
@@ -173,6 +167,8 @@ def trivia_game():
         print(" ⭐️ Excellent")
     else:
         print("🙈 Better Luck Next Time - Loser")
+
+
 
 if __name__ == "__main__":
     trivia_game()
