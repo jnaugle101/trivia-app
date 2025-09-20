@@ -9,6 +9,16 @@ from Trivia_Game import questions  # make sure Trivia_Game.py does NOT auto-run
 st.set_page_config(page_title="Trivia Game", page_icon="❓")
 st.title("❓ Trivia Game")
 
+# Always show rules in the sidebar too (handy during the quiz)
+with st.sidebar:
+    st.header("📋 Rules")
+    st.markdown("""
+    - Numeric answers are **digits** (e.g., `1`, `2`, `1985`)
+    - **Case-insensitive**, but spelling matters
+    - Comma/“or” answers: **any one** counts
+    - Review at the end; **Quit** anytime
+    """)
+
 # ---- Helpers ----
 def normalize(s: str) -> str:
     """Lowercase, trim, remove punctuation, collapse spaces."""
@@ -39,7 +49,17 @@ if "history" not in st.session_state:
     st.session_state.history = []   # list of dicts: {q, user, correct, is_correct}
 
 # ---- Start screen ----
+# ---- Start screen ----
 if not st.session_state.started:
+    # ✅ Rules visible when the app first opens
+    with st.expander("📋 Rules & Tips", expanded=True):
+        st.markdown("""
+        - **Numeric answers must be digits** (e.g., `1`, `2`, `1985`).
+        - **Spelling counts** (answers are **case-insensitive**, but spelling matters).
+        - Some answers have options (e.g., **“Green or red”** or **comma-separated** lists) — any listed option counts.
+        - You’ll get a full review at the end; you can **Quit** anytime.
+        """)
+
     total_available = len(questions)
     num_default = min(10, total_available)
     num_q = st.slider("How many questions?", 1, total_available, num_default)
