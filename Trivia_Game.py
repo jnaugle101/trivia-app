@@ -139,7 +139,7 @@ questions = {
 "Dubbed the “Black Death,” what plague swept through Europe in the 1300s?":  "bubonic plague"
 }
 
-def triva_game():
+def trivia_game():
     print("🎮 Welcome to Trivia Game!\n")
     print("📋 Rules & Tips:")
     print("1. Answers with numbers must be digits (e.g., 1, 2, 1985).")
@@ -173,6 +173,10 @@ def triva_game():
         print(" ⭐️ Excellent")
     else:
         print("🙈 Better Luck Next Time - Loser")
+
+if __name__ == "__main__":
+    trivia_game()
+
 
 #any updates runs the following in a terminal:
 #cd /Users/jeremyn/PyCharmMiscProject/trivia-app
