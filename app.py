@@ -9,6 +9,14 @@ from Trivia_Game import questions  # make sure Trivia_Game.py does NOT auto-run
 st.set_page_config(page_title="Trivia Game", page_icon="❓")
 st.title("❓ Trivia Game")
 
+# ---- Quick reset so the start screen (rules) shows again ----
+if st.button("🔄 New Game / Show Rules"):
+    st.session_state.started = False
+    st.session_state.index = 0
+    st.session_state.order = []
+    st.session_state.history = []
+    st.rerun()
+
 # Always show rules in the sidebar too (handy during the quiz)
 with st.sidebar:
     st.header("📋 Rules")
