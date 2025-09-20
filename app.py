@@ -1,7 +1,6 @@
 import random
 import re
 import streamlit as st
-from rapidfuzz import fuzz
 import difflib
 
 # ✅ Import YOUR question bank (a dict: question -> answer)
@@ -78,7 +77,6 @@ def is_correct(user: str, correct: str) -> bool:
         thresh = 0.88 if len(p) <= 6 else 0.8
         if ratio >= thresh:
             return True
-
     return False
 
 # ---- Session state ----
